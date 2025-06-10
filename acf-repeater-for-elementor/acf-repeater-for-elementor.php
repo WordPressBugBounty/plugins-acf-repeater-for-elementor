@@ -4,11 +4,11 @@ Plugin Name: ACF Repeater for Elementor
 Plugin URI: http://wordpress.org/plugins/acf-repeater-for-elementor/
 Description: Easy and simple way to use acf pro repeater in elementor.
 Author: Sympl
-Version: 2.0
+Version: 2.1
 Author URI: https://sympl.co.il/
 */
 
-//TODO! 2.1 - Render accordion tabs better (not by duplicating the widget but by injecting new tabs into the existing widget)
+//TODO! 2.2 - Render accordion tabs better (not by duplicating the widget but by injecting new tabs into the existing widget)
 
 //Import the elementor settings
 require_once( plugin_dir_path( __FILE__ ) . 'arfe-elementor-settings.php' );
@@ -126,6 +126,11 @@ function arfe_replace_content($content, $key, $value) {
 
 function arfe_check_if_repeater_class_in_widget($widget) {
     $classes = $widget->get_settings('_css_classes');
+
+    if( empty($classes) ) {
+        $classes = $widget->get_settings('css_classes');
+    }
+
     //Check if there is a class name start with arfe_repeater_ - if so return the name of the repeater
     if (preg_match('/arfe_repeater_([A-Za-z0-9\-_]+)/', $classes, $matches)) {
         return $matches[1]; // Return the repeater name

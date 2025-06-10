@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/donate/?hosted_button_id=GD9PZHTB5PBR8
 Tags: elementor, acf, repeater, advanced custom fields, dynamic content
 Requires at least: 5.0
 Tested up to: 6.8.1
-Stable tag: 4.7
+Stable tag: 2.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -123,10 +123,15 @@ Yes, you can use ACF repeaters in Elementor templates, theme builder layouts, an
 = 2.0 =
 (09/05/2025) now allows the user to select the ACF Repeater field in the Elementor widget or section settings, making it easier to integrate with Elementor's visual builder.
 (09/05/2025) new widget - ACF repeater to loop, which allows you to use the ACF repeater field in a loop, making it easier to display repeated content in Elementor.
+= 2.1 =
+(10/01/2025) Support for old class naming convention, allowing users to continue using the previous Elementor widgets and sections.
+
 
 == Upgrade Notice ==
 = 2.0 =
 Major update to improve usability and compatibility with Elementor's latest versions. Now supports direct selection of ACF Repeater fields in Elementor widgets and sections, enhancing the dynamic content experience.
+= 2.1 =
+(10/01/2025) Support elementor old class naming, support also the inner section widget.
 
 
 == Support ==

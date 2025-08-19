@@ -4,11 +4,9 @@ Plugin Name: ACF Repeater for Elementor
 Plugin URI: http://wordpress.org/plugins/acf-repeater-for-elementor/
 Description: Easy and simple way to use acf pro repeater in elementor.
 Author: Sympl
-Version: 2.1
+Version: 2.2
 Author URI: https://sympl.co.il/
 */
-
-//TODO! 2.2 - Render accordion tabs better (not by duplicating the widget but by injecting new tabs into the existing widget)
 
 //Import the elementor settings
 require_once( plugin_dir_path( __FILE__ ) . 'arfe-elementor-settings.php' );
@@ -53,7 +51,7 @@ add_action( 'admin_init', 'conditional_plugin_dependency_check' );
 
 
 // Add the ACF Repeater settings to Elementor widgets - use Elementor_ACF_Repeater_Settings class
-$elementor_acf_repeater_settings = new Elementor_ACF_Repeater_Settings();
+$elementor_acf_repeater_settings = new Elementor_ACF_Field_Settings();
 
 
 add_action( 'elementor/widgets/register', function( $widgets_manager ) {
@@ -98,7 +96,7 @@ function arfe_prepare_content_by_repeater($content, $repeater_name) {
 		if(!$repeater || count($repeater) == 0) {
 			return "";
 		}
-		
+
 		$new_view = '';
 		foreach($repeater as $row) {
 			$single_content = $content;
@@ -148,8 +146,9 @@ function arfe_check_if_repeater_class_in_widget($widget) {
         // Look for repeater_ in the data and replace it with 'arfe_repeater_'
         $elementor_data = preg_replace('/repeater_/', 'arfe_repeater_', $elementor_data, 1);
 
+        // Update doesnt work with old versions elementor pages.
         // Update the post meta with the modified data
-        update_post_meta( get_the_ID(), '_elementor_data', json_decode($elementor_data) );
+//        update_post_meta( get_the_ID(), '_elementor_data', json_decode($elementor_data) );
 
         return $matches[1];
     }
@@ -175,12 +174,280 @@ add_action( 'elementor/frontend/widget/after_render', function( $widget ) {
     // We handle the loop-carousel in the elementor/widget/render_content hook
 
     if($repeater_name && $widget->get_name() != "loop-carousel" && $widget->get_name() != "arfe_repeater_carousel") {
-        echo arfe_prepare_content_by_repeater($widget_content_output, $repeater_name);
+        // Special handling for accordion widget
+        if($widget->get_name() == "accordion" || $widget->get_name() == "toggle") {
+            echo arfe_prepare_accordion_by_repeater($widget_content_output, $repeater_name);
+        } else if($widget->get_name() == "nested-accordion") {
+            echo arfe_prepare_nested_accordion_by_repeater($widget_content_output, $repeater_name);
+        } else {
+            echo arfe_prepare_content_by_repeater($widget_content_output, $repeater_name);
+        }
     } else {
         echo $widget_content_output;
     }
 });
 
 
+/**
+ * Process accordion widget with repeater field
+ * Instead of duplicating the entire accordion widget, this function adds tabs to the existing accordion
+ */
+function arfe_prepare_accordion_by_repeater($content, $repeater_name) {
+    $repeater = get_field($repeater_name);
+    if(!$repeater || count($repeater) == 0) {
+        return "";
+    }
 
+    // Create a DOMDocument to parse the HTML content
+    $dom = new \DOMDocument();
+    // Suppress warnings for HTML5 tags
+    @$dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+    $xpath = new \DOMXPath($dom);
 
+    // Find the main accordion container
+    $accordion = $xpath->query('//div[contains(@class, "elementor-accordion")]')->item(0);
+
+    if (!$accordion) {
+        return $content; // Return original content if accordion not found
+    }
+
+    // Find the first accordion item to use as a template
+    $template_item = $xpath->query('.//div[contains(@class, "elementor-accordion-item")]', $accordion)->item(0);
+
+    if (!$template_item) {
+        return $content; // Return original content if no accordion item found
+    }
+
+    // Find the title and content elements in the template item
+    $title_wrapper = $xpath->query('.//*[contains(@class, "elementor-tab-title")]', $template_item)->item(0);
+    $content_element = $xpath->query('.//*[contains(@class, "elementor-tab-content")]', $template_item)->item(0);
+
+    // Extract base ID and tab count for generating unique IDs
+    $base_id = '';
+    $tab_count = 1;
+
+    if ($title_wrapper && $title_wrapper->hasAttribute('id')) {
+        $id_attr = $title_wrapper->getAttribute('id');
+        // Parse ID like "elementor-tab-title-1231"
+        if (preg_match('/elementor-tab-title-(\d+)(\d+)$/', $id_attr, $matches)) {
+            $base_id = $matches[1]; // e.g., "123"
+            $tab_count = intval($matches[2]); // e.g., "1"
+        }
+    }
+
+    // Clone the template item for each repeater row
+    $index = 0;
+    foreach ($repeater as $row) {
+        $new_item = $template_item->cloneNode(true);
+        $index++;
+
+        // Find elements that need unique IDs in the new item
+        $new_title_wrapper = $xpath->query('.//*[contains(@class, "elementor-tab-title")]', $new_item)->item(0);
+        $new_content_element = $xpath->query('.//*[contains(@class, "elementor-tab-content")]', $new_item)->item(0);
+        $title_element = $xpath->query('.//a[contains(@class, "elementor-accordion-title")]', $new_item)->item(0);
+
+        // Calculate new tab count
+        $new_tab_count = $tab_count + $index;
+
+        // Update IDs and attributes for the title wrapper
+        if ($new_title_wrapper) {
+            if ($new_title_wrapper->hasAttribute('id')) {
+                $new_title_wrapper->setAttribute('id', 'elementor-tab-title-' . $base_id . $new_tab_count);
+            }
+            if ($new_title_wrapper->hasAttribute('data-tab')) {
+                $new_title_wrapper->setAttribute('data-tab', $new_tab_count);
+            }
+            if ($new_title_wrapper->hasAttribute('aria-controls')) {
+                $new_title_wrapper->setAttribute('aria-controls', 'elementor-tab-content-' . $base_id . $new_tab_count);
+            }
+        }
+
+        // Update IDs and attributes for the content element
+        if ($new_content_element) {
+            if ($new_content_element->hasAttribute('id')) {
+                $new_content_element->setAttribute('id', 'elementor-tab-content-' . $base_id . $new_tab_count);
+            }
+            if ($new_content_element->hasAttribute('data-tab')) {
+                $new_content_element->setAttribute('data-tab', $new_tab_count);
+            }
+            if ($new_content_element->hasAttribute('aria-labelledby')) {
+                $new_content_element->setAttribute('aria-labelledby', 'elementor-tab-title-' . $base_id . $new_tab_count);
+            }
+        }
+
+        // Replace placeholders in title
+        if ($title_element) {
+            $title = $title_element->textContent;
+            foreach ($row as $key => $value) {
+                $title = str_replace("#" . $key, $value, $title);
+            }
+            $title_element->textContent = $title;
+        }
+
+        // Replace placeholders in content
+        if ($new_content_element) {
+            $content_html = $dom->saveHTML($new_content_element);
+
+            // Replace placeholders in content HTML
+            foreach ($row as $key => $value) {
+                $content_html = str_replace("#" . $key, $value, $content_html);
+            }
+
+            // Update the content element's innerHTML
+            $temp_dom = new \DOMDocument();
+            @$temp_dom->loadHTML(mb_convert_encoding($content_html, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+            $temp_content = $temp_dom->getElementsByTagName('div')->item(0);
+
+            if ($temp_content) {
+                // Import the node from temp_dom to our main dom
+                $imported_content = $dom->importNode($temp_content, true);
+
+                // Replace the old content with the new one
+                if ($new_content_element->parentNode) {
+                    $new_content_element->parentNode->replaceChild($imported_content, $new_content_element);
+                }
+            }
+        }
+
+        // Add the new item to the accordion
+        $accordion->appendChild($new_item);
+    }
+
+    // Remove the template item (first item) as it was just used as a template
+    $accordion->removeChild($template_item);
+
+    // Get the modified HTML
+    $html = $dom->saveHTML();
+
+    return $html;
+}
+
+/**
+ * Process nested-accordion widget with repeater field
+ * Instead of duplicating the entire accordion widget, this function adds items to the existing nested-accordion
+ */
+function arfe_prepare_nested_accordion_by_repeater($content, $repeater_name) {
+    $repeater = get_field($repeater_name);
+    if(!$repeater || count($repeater) == 0) {
+        return "";
+    }
+
+    // Create a DOMDocument to parse the HTML content
+    $dom = new \DOMDocument();
+    // Suppress warnings for HTML5 tags
+    @$dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+    $xpath = new \DOMXPath($dom);
+
+    // Find the main accordion container
+    $accordion = $xpath->query('//div[contains(@class, "e-n-accordion")]')->item(0);
+
+    if (!$accordion) {
+        return $content; // Return original content if accordion not found
+    }
+
+    // Find the first accordion item to use as a template
+    $template_item = $xpath->query('.//details[contains(@class, "e-n-accordion-item")]', $accordion)->item(0);
+
+    if (!$template_item) {
+        return $content; // Return original content if no accordion item found
+    }
+
+    // Find the title and content elements in the template item
+    $title_wrapper = $xpath->query('.//summary[contains(@class, "e-n-accordion-item-title")]', $template_item)->item(0);
+    $title_text = $xpath->query('.//*[contains(@class, "e-n-accordion-item-title-text")]', $template_item)->item(0);
+    $content_element = $xpath->query('.//div[@role="region"]', $template_item)->item(0);
+
+    // Extract base ID for generating unique IDs
+    $base_id = '';
+    $item_count = 1;
+
+    if ($template_item && $template_item->hasAttribute('id')) {
+        $id_attr = $template_item->getAttribute('id');
+        // Parse ID like "e-n-accordion-item-1440"
+        if (preg_match('/e-n-accordion-item-(\d+)$/', $id_attr, $matches)) {
+            $base_id = $matches[1]; // e.g., "1440"
+        }
+    }
+
+    // Check if the template item has the open attribute
+    $has_open_attr = $template_item->hasAttribute('open');
+
+    // Clone the template item for each repeater row
+    $index = 0;
+    foreach ($repeater as $row) {
+        $new_item = $template_item->cloneNode(true);
+        $index++;
+
+        // Generate a new unique ID for this item
+        $new_item_id = 'e-n-accordion-item-' . ($base_id + $index);
+        $new_item->setAttribute('id', $new_item_id);
+
+        // Only keep the open attribute for the first item
+        if ($has_open_attr) {
+            if ($index > 1) {
+                $new_item->removeAttribute('open');
+            }
+        }
+
+        // Find elements that need unique IDs in the new item
+        $new_title_wrapper = $xpath->query('.//summary[contains(@class, "e-n-accordion-item-title")]', $new_item)->item(0);
+        $new_title_text = $xpath->query('.//*[contains(@class, "e-n-accordion-item-title-text")]', $new_item)->item(0);
+        $new_content_element = $xpath->query('.//div[@role="region"]', $new_item)->item(0);
+
+        // Update attributes for the title wrapper
+        if ($new_title_wrapper) {
+            $new_title_wrapper->setAttribute('aria-controls', $new_item_id);
+            $new_title_wrapper->setAttribute('data-accordion-index', $item_count + $index);
+        }
+
+        // Update attributes for the content element
+        if ($new_content_element) {
+            $new_content_element->setAttribute('aria-labelledby', $new_item_id);
+        }
+
+        // Replace placeholders in title
+        if ($new_title_text) {
+            $title = $new_title_text->textContent;
+            foreach ($row as $key => $value) {
+                $title = str_replace("#" . $key, $value, $title);
+            }
+            $new_title_text->textContent = $title;
+        }
+
+        // Replace placeholders in content
+        if ($new_content_element) {
+            $content_html = $dom->saveHTML($new_content_element);
+
+            // Replace placeholders in content HTML
+            foreach ($row as $key => $value) {
+                $content_html = str_replace("#" . $key, $value, $content_html);
+            }
+
+            // Update the content element's innerHTML
+            $temp_dom = new \DOMDocument();
+            @$temp_dom->loadHTML(mb_convert_encoding($content_html, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+            $temp_content = $temp_dom->getElementsByTagName('div')->item(0);
+
+            if ($temp_content) {
+                // Import the node from temp_dom to our main dom
+                $imported_content = $dom->importNode($temp_content, true);
+
+                // Replace the old content with the new one
+                if ($new_content_element->parentNode) {
+                    $new_content_element->parentNode->replaceChild($imported_content, $new_content_element);
+                }
+            }
+        }
+
+        // Add the new item to the accordion
+        $accordion->appendChild($new_item);
+    }
+
+    // Remove the template item (first item) as it was just used as a template
+    $accordion->removeChild($template_item);
+
+    // Get the modified HTML
+    $html = $dom->saveHTML();
+
+    return $html;
+}

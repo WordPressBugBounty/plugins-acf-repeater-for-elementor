@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/donate/?hosted_button_id=GD9PZHTB5PBR8
 Tags: elementor, acf, repeater, advanced custom fields, dynamic content
 Requires at least: 5.0
 Tested up to: 6.8.1
-Stable tag: 2.1
+Stable tag: 2.2
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -15,13 +15,15 @@ Seamlessly integrate ACF Repeater fields with Elementor widgets and sections for
 
 **ACF Repeater For Elementor** bridges the gap between Advanced Custom Fields (ACF) Pro repeater functionality and Elementor's visual builder. This powerful plugin allows you to create dynamic, repeatable content sections without complex coding.
 
+### Important! Doesn't work with elementor widget cache feature (Need to be turned off)
+
 ### 🚀 Key Features
 
 * **Easy Integration**: Connect ACF repeater fields directly with Elementor widgets
 * **Dynamic Content**: Automatically populate Elementor elements with ACF repeater data
 * **Flexible Usage**: Works with columns, sections, and individual widgets
-* **Special Support**: Built-in support for accordions and toggle elements
 * **Legacy Compatible**: Maintains backward compatibility with existing implementations
+* **Hide Widget on Empty Fields**: Hide elements and containers based on empty ACF fields conditions
 
 ### 🎯 Perfect For
 
@@ -48,7 +50,7 @@ Seamlessly integrate ACF Repeater fields with Elementor widgets and sections for
 
 == How To Use ==
 
-### Usage (Recommended)
+### Usage
 
 1. **Create ACF Repeater Field**: Set up your repeater field in ACF with sub-fields
 2. **Select the repeater**: In Elementor, widget, section or ACF Repeater loop set the ACF repeater field
@@ -73,6 +75,17 @@ Seamlessly integrate ACF Repeater fields with Elementor widgets and sections for
 Add new Accordion widget to the page, set the ACF Repeater field in the widget's advanced settings, and use the sub-field names as placeholders as described above.
 
 The plugin will automatically structure these for accordion/toggle widgets.
+
+### Hide Widget on Empty ACF Fields
+
+You can now hide widgets based on empty ACF fields. Follow these steps:
+
+1. **Select the Widget**: Choose the widget you want to hide if an ACF field is empty.
+2. **Advanced Settings**: Go to the 'Advanced' settings tab in Elementor editor.
+3. **Hide on Empty Field**: Enable the option to hide the widget if an ACF field is empty.
+4. **Choose Field**: Select the ACF field you want to check for emptiness.
+
+The widget will be hidden if the selected ACF field is empty.
 
 == Legacy Usage ==
 
@@ -125,6 +138,9 @@ Yes, you can use ACF repeaters in Elementor templates, theme builder layouts, an
 (09/05/2025) new widget - ACF repeater to loop, which allows you to use the ACF repeater field in a loop, making it easier to display repeated content in Elementor.
 = 2.1 =
 (10/01/2025) Support for old class naming convention, allowing users to continue using the previous Elementor widgets and sections.
+= 2.2 =
+(10/15/2025) Allow the user to hide empty fields of acf.
+(10/15/2025) Field selection is now using Select2
 
 
 == Upgrade Notice ==
@@ -132,6 +148,8 @@ Yes, you can use ACF repeaters in Elementor templates, theme builder layouts, an
 Major update to improve usability and compatibility with Elementor's latest versions. Now supports direct selection of ACF Repeater fields in Elementor widgets and sections, enhancing the dynamic content experience.
 = 2.1 =
 (10/01/2025) Support elementor old class naming, support also the inner section widget.
+= 2.2 =
+(10/15/2025) Added option to hide empty fields in ACF Repeater, improving the display of repeated content.
 
 
 == Support ==

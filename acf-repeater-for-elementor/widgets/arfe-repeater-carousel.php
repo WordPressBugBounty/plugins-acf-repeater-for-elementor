@@ -78,6 +78,7 @@ class ARFE_Repeater_Carousel extends Loop_Carousel
                         const isRtl = elementorFrontend.config.is_rtl;
                         const widgetSelector = `.elementor-element-${this.getID()}`;
 
+
                         // This is the crucial part - proper navigation setup
                         if ('yes' === elementSettings.arrows) {
                             swiperOptions.navigation = {
@@ -94,7 +95,28 @@ class ARFE_Repeater_Carousel extends Loop_Carousel
                     }
 
                     async onInit() {
-                        super.onInit(...arguments);
+                        // Don't call super.onInit() to avoid the early return when there's only one slide
+                        // Instead, call the grandparent's onInit method
+                        elementorModules.frontend.handlers.Base.prototype.onInit.apply(this, arguments);
+
+                        // Initialize Swiper regardless of slide count
+                        const Swiper = elementorFrontend.utils.swiper;
+                        const swiperOptions = this.getSwiperSettings();
+
+                        // Only proceed with Swiper initialization if we have a container
+                        if (this.elements.$swiperContainer && this.elements.$swiperContainer.length) {
+                            this.swiper = await new Swiper(this.elements.$swiperContainer, swiperOptions);
+
+                            // Handle pause on hover if enabled
+                            const elementSettings = this.getElementSettings();
+                            if ('yes' === elementSettings.pause_on_hover) {
+                                this.togglePauseOnHover(true);
+                            }
+
+                            // Expose the swiper instance in the frontend
+                            this.elements.$swiperContainer.data('swiper', this.swiper);
+                        }
+
                         this.ranElementHandlers = false;
                     }
 
@@ -113,7 +135,6 @@ class ARFE_Repeater_Carousel extends Loop_Carousel
                     const carousel = new ARFELoopCarousel({
                         $element: $scope
                     });
-                    console.log(carousel)
                 });
             });
         </script>

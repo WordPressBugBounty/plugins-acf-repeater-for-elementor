@@ -55,6 +55,11 @@ class ARFE_Repeater_Carousel extends Loop_Carousel
         return $content;
     }
 
+    // elementor-widget-loop-carousel Must be part of the class name so all the styling settings will be attached to it.
+    protected function get_html_wrapper_class() {
+        return 'elementor-widget-' . $this->get_name() . ' elementor-widget-loop-carousel';
+    }
+
     public function after_render()
     {
         parent::after_render();
@@ -183,6 +188,12 @@ class ARFE_Repeater_Query
     public function modify_the_content($content)
     {
         $current_row = $this->get_current_row();
+
+        // Process the row to translate values if the function exists
+        if (function_exists('arfe_process_repeater_row')) {
+            $current_row = arfe_process_repeater_row($current_row);
+        }
+
         $content = apply_filters('arfe_repeater_row_content', $content, $current_row);
         // Remove the action after modifying the content
         remove_action('elementor/frontend/the_content', [$this, 'modify_the_content'], 10);

@@ -4,7 +4,7 @@ Plugin Name: ACF Repeater for Elementor
 Plugin URI: http://wordpress.org/plugins/acf-repeater-for-elementor/
 Description: Easy and simple way to use acf pro repeater in elementor.
 Author: Sympl
-Version: 2.2
+Version: 2.3
 Author URI: https://sympl.co.il/
 */
 
@@ -99,6 +99,9 @@ function arfe_prepare_content_by_repeater($content, $repeater_name) {
 
 		$new_view = '';
 		foreach($repeater as $row) {
+			// Process the row to translate values
+			$row = arfe_process_repeater_row($row);
+
 			$single_content = $content;
 			$single_content = apply_filters('arfe_repeater_row_content', $single_content, $row);
 			$new_view = $new_view.''.$single_content;
@@ -116,9 +119,59 @@ function arfe_repeater_row_content_fn ($single_content, $row)
 }
 
 
+/**
+ * Check if TranslatePress is active
+ *
+ * @return bool True if TranslatePress is active, false otherwise
+ */
+function arfe_is_translatepress_active() {
+    return function_exists('trp_translate');
+}
+
+/**
+ * Translate text if TranslatePress is active
+ *
+ * @param string $text Text to translate
+ * @return string Translated text or original text if TranslatePress is not active
+ */
+function arfe_translate_text($text) {
+    if (arfe_is_translatepress_active()) {
+        return trp_translate($text, get_locale(), false);
+    }
+    return $text;
+}
+
+/**
+ * Process a row of repeater data and translate values
+ *
+ * @param array $row The repeater row data
+ * @return array The processed row with translated values
+ */
+function arfe_process_repeater_row($row) {
+    if (!is_array($row)) {
+        return $row;
+    }
+
+    $processed_row = [];
+    foreach ($row as $key => $value) {
+        if (is_string($value)) {
+            $processed_row[$key] = arfe_translate_text($value);
+        } else {
+            $processed_row[$key] = $value;
+        }
+    }
+    return $processed_row;
+}
+
 function arfe_replace_content($content, $key, $value) {
     // Replace the content with the value of the key
     // We use preg_replace to handle cases where the key might be in a format like {{key}}
+
+    // Translate the value if it's a string and TranslatePress is active
+    if (is_string($value)) {
+        $value = arfe_translate_text($value);
+    }
+
     return str_replace("#".$key, $value, $content);
 }
 
@@ -197,6 +250,8 @@ function arfe_prepare_accordion_by_repeater($content, $repeater_name) {
     if(!$repeater || count($repeater) == 0) {
         return "";
     }
+
+
 
     // Create a DOMDocument to parse the HTML content
     $dom = new \DOMDocument();
@@ -279,6 +334,10 @@ function arfe_prepare_accordion_by_repeater($content, $repeater_name) {
         if ($title_element) {
             $title = $title_element->textContent;
             foreach ($row as $key => $value) {
+                // Translate the value if it's a string
+                if (is_string($value)) {
+                    $value = arfe_translate_text($value);
+                }
                 $title = str_replace("#" . $key, $value, $title);
             }
             $title_element->textContent = $title;
@@ -409,7 +468,7 @@ function arfe_prepare_nested_accordion_by_repeater($content, $repeater_name) {
         if ($new_title_text) {
             $title = $new_title_text->textContent;
             foreach ($row as $key => $value) {
-                $title = str_replace("#" . $key, $value, $title);
+                $title = str_replace("#" . $key, arfe_translate_text($value), $title);
             }
             $new_title_text->textContent = $title;
         }
@@ -420,7 +479,7 @@ function arfe_prepare_nested_accordion_by_repeater($content, $repeater_name) {
 
             // Replace placeholders in content HTML
             foreach ($row as $key => $value) {
-                $content_html = str_replace("#" . $key, $value, $content_html);
+                $content_html = str_replace("#" . $key, arfe_translate_text($value), $content_html);
             }
 
             // Update the content element's innerHTML

@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/donate/?hosted_button_id=GD9PZHTB5PBR8
 Tags: elementor, acf, repeater, advanced custom fields, dynamic content
 Requires at least: 5.0
 Tested up to: 6.8.1
-Stable tag: 2.2
+Stable tag: 2.3
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -141,6 +141,10 @@ Yes, you can use ACF repeaters in Elementor templates, theme builder layouts, an
 = 2.2 =
 (10/15/2025) Allow the user to hide empty fields of acf.
 (10/15/2025) Field selection is now using Select2
+= 2.3 =
+Added support for translation using TranslatePress, making it easier to create multilingual content with ACF Repeater fields.
+Attach style settings of ACF Repeater Loop Carousel to the widget.
+Added instructions for ACF Repeater Loop Carousel
 
 
 == Upgrade Notice ==
@@ -150,6 +154,9 @@ Major update to improve usability and compatibility with Elementor's latest vers
 (10/01/2025) Support elementor old class naming, support also the inner section widget.
 = 2.2 =
 (10/15/2025) Added option to hide empty fields in ACF Repeater, improving the display of repeated content.
+= 2.3 =
+Now supports translation using TranslatePress, making it easier to create multilingual content with ACF Repeater fields.
+Fix ACF Repeater Loop Carousel styles
 
 
 == Support ==

@@ -1,9 +1,9 @@
-=== ACF Repeater For Elementor ===
+=== Sympl Repeater for ACF and Elementor ===
 Contributors: Sympl
 Donate link: https://www.paypal.com/donate/?hosted_button_id=GD9PZHTB5PBR8
 Tags: elementor, acf, repeater, advanced custom fields, dynamic content
 Requires at least: 5.0
-Tested up to: 6.8.1
+Tested up to: 6.8
 Stable tag: 2.3
 Requires PHP: 7.4
 License: GPLv2 or later
@@ -43,7 +43,7 @@ Seamlessly integrate ACF Repeater fields with Elementor widgets and sections for
 
 == Installation ==
 
-1. Upload the plugin files to `/wp-content/plugins/acf-repeater-for-elementor/` directory
+1. Upload the plugin files to `/wp-content/plugins/sympl-repeater-for-acf-and-elementor/` directory
 2. Activate the plugin through the 'Plugins' screen in WordPress
 3. Ensure you have Elementor, Elementor Pro, and ACF Pro installed and activated
 4. Start using ACF repeater fields in your Elementor designs!
@@ -161,7 +161,7 @@ Fix ACF Repeater Loop Carousel styles
 
 == Support ==
 
-For support, feature requests, or bug reports, please visit our [support forum](https://wordpress.org/support/plugin/acf-repeater-for-elementor/) or contact us directly.
+For support, feature requests, or bug reports, please visit our [support forum](https://wordpress.org/support/plugin/sympl-repeater-for-acf-and-elementor/) or contact us directly.
 
 **Pro Tip**: Always test new repeater implementations on a staging site before deploying to production!
 

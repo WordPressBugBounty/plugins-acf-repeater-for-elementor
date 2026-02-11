@@ -1,8 +1,10 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 use Elementor\Controls_Manager;
 
 
-class ACF_Repeater_Dynamic_Tag extends \Elementor\Core\DynamicTags\Tag {
+class SYMP_ACF_Repeater_Dynamic_Tag extends \Elementor\Core\DynamicTags\Tag {
     public function get_name() {
         return 'acf-repeater-field';
     }
@@ -23,7 +25,7 @@ class ACF_Repeater_Dynamic_Tag extends \Elementor\Core\DynamicTags\Tag {
 
     protected function register_controls() {
         //Get all existing repeater fields
-        $options = ACF_Repeater_Dynamic_Tag::GET_ALL_INNER_REPEATER_FIELDS_FLATTENED();
+        $options = SYMP_ACF_Repeater_Dynamic_Tag::GET_ALL_INNER_REPEATER_FIELDS_FLATTENED();
 
         $this->add_control(
             'repeater_sub_field',
@@ -70,13 +72,13 @@ class ACF_Repeater_Dynamic_Tag extends \Elementor\Core\DynamicTags\Tag {
                 // Recursive call for nested repeater
                 self::FLATTEN_REPEATER_FIELDS($sub_field, $output, $current_label);
             } else {
-                $options[$sub_field['name']] = esc_html($sub_field['label'], 'acf-repeater-for-elementor');
+                $options[$sub_field['name']] = esc_html( $sub_field['label'] );
             }
         }
 
         if (!empty($options)) {
             $output[] = [
-                'label' => esc_html($current_label, 'acf-repeater-for-elementor'),
+                'label' => esc_html( $current_label ),
                 'options' => $options,
             ];
         }

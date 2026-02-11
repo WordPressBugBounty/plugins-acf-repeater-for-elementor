@@ -1,4 +1,5 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 /**
  * Elementor ACF Repeater Settings and Hide on Empty Field
@@ -7,7 +8,7 @@
  *
  * @package ACF_Fields_For_Elementor
  */
-class Elementor_ACF_Field_Settings
+class Sympl_Elementor_ACF_Field_Settings
 {
     public function __construct()
     {
@@ -135,7 +136,7 @@ class Elementor_ACF_Field_Settings
         $element->start_controls_section(
             'section_hide_empty_field',
             [
-                'label' => __('Hide on Condition ACF Field', 'acf-fields-for-elementor'),
+                'label' => __('Hide on Condition ACF Field', 'acf-repeater-for-elementor'),
                 'tab' => \Elementor\Controls_Manager::TAB_ADVANCED,
             ]
         );
@@ -148,10 +149,10 @@ class Elementor_ACF_Field_Settings
             $element->add_control(
                 'arfe_enable_conditions',
                 [
-                    'label' => __('Enable Hide Conditions', 'acf-fields-for-elementor'),
+                    'label' => __('Enable Hide Conditions', 'acf-repeater-for-elementor'),
                     'type' => \Elementor\Controls_Manager::SWITCHER,
-                    'label_on' => __('Yes', 'acf-fields-for-elementor'),
-                    'label_off' => __('No', 'acf-fields-for-elementor'),
+                    'label_on' => __('Yes', 'acf-repeater-for-elementor'),
+                    'label_off' => __('No', 'acf-repeater-for-elementor'),
                     'return_value' => 'yes',
                     'default' => '',
                 ]
@@ -161,11 +162,11 @@ class Elementor_ACF_Field_Settings
             $element->add_control(
                 'arfe_conditions_relation',
                 [
-                    'label' => __('Conditions Relation', 'acf-fields-for-elementor'),
+                    'label' => __('Conditions Relation', 'acf-repeater-for-elementor'),
                     'type' => \Elementor\Controls_Manager::SELECT,
                     'options' => [
-                        'and' => __('AND (all conditions must be true)', 'acf-fields-for-elementor'),
-                        'or' => __('OR (at least one condition must be true)', 'acf-fields-for-elementor'),
+                        'and' => __('AND (all conditions must be true)', 'acf-repeater-for-elementor'),
+                        'or' => __('OR (at least one condition must be true)', 'acf-repeater-for-elementor'),
                     ],
                     'default' => 'and',
                     'condition' => [
@@ -180,7 +181,7 @@ class Elementor_ACF_Field_Settings
             $repeater->add_control(
                 'field_name',
                 [
-                    'label' => __('ACF Field', 'acf-fields-for-elementor'),
+                    'label' => __('ACF Field', 'acf-repeater-for-elementor'),
                     'type' => \Elementor\Controls_Manager::SELECT2,
                     'options' => $acf_fields,
                     'default' => '',
@@ -190,19 +191,19 @@ class Elementor_ACF_Field_Settings
             $repeater->add_control(
                 'operator',
                 [
-                    'label' => __('Operator', 'acf-fields-for-elementor'),
+                    'label' => __('Operator', 'acf-repeater-for-elementor'),
                     'type' => \Elementor\Controls_Manager::SELECT,
                     'options' => [
-                        'empty' => __('Is Empty', 'acf-fields-for-elementor'),
-                        'not_empty' => __('Is Not Empty', 'acf-fields-for-elementor'),
-                        'equal' => __('Equal To', 'acf-fields-for-elementor'),
-                        'not_equal' => __('Not Equal To', 'acf-fields-for-elementor'),
-                        'contains' => __('Contains', 'acf-fields-for-elementor'),
-                        'not_contains' => __('Does Not Contain', 'acf-fields-for-elementor'),
-                        'greater_than' => __('Greater Than', 'acf-fields-for-elementor'),
-                        'less_than' => __('Less Than', 'acf-fields-for-elementor'),
-                        'greater_equal' => __('Greater Than or Equal', 'acf-fields-for-elementor'),
-                        'less_equal' => __('Less Than or Equal', 'acf-fields-for-elementor'),
+                        'empty' => __('Is Empty', 'acf-repeater-for-elementor'),
+                        'not_empty' => __('Is Not Empty', 'acf-repeater-for-elementor'),
+                        'equal' => __('Equal To', 'acf-repeater-for-elementor'),
+                        'not_equal' => __('Not Equal To', 'acf-repeater-for-elementor'),
+                        'contains' => __('Contains', 'acf-repeater-for-elementor'),
+                        'not_contains' => __('Does Not Contain', 'acf-repeater-for-elementor'),
+                        'greater_than' => __('Greater Than', 'acf-repeater-for-elementor'),
+                        'less_than' => __('Less Than', 'acf-repeater-for-elementor'),
+                        'greater_equal' => __('Greater Than or Equal', 'acf-repeater-for-elementor'),
+                        'less_equal' => __('Less Than or Equal', 'acf-repeater-for-elementor'),
                     ],
                     'default' => 'empty',
                 ]
@@ -211,7 +212,7 @@ class Elementor_ACF_Field_Settings
             $repeater->add_control(
                 'value',
                 [
-                    'label' => __('Value', 'acf-fields-for-elementor'),
+                    'label' => __('Value', 'acf-repeater-for-elementor'),
                     'type' => \Elementor\Controls_Manager::TEXT,
                     'default' => '',
                     'condition' => [
@@ -223,7 +224,7 @@ class Elementor_ACF_Field_Settings
             $element->add_control(
                 'arfe_hide_conditions',
                 [
-                    'label' => __('Hide Conditions', 'acf-fields-for-elementor'),
+                    'label' => __('Hide Conditions', 'acf-repeater-for-elementor'),
                     'type' => \Elementor\Controls_Manager::REPEATER,
                     'fields' => $repeater->get_controls(),
                     'default' => [
@@ -245,7 +246,7 @@ class Elementor_ACF_Field_Settings
                 'arfe_conditions_info',
                 [
                     'type' => \Elementor\Controls_Manager::RAW_HTML,
-                    'raw' => __('Element will be hidden when the conditions are met.', 'acf-fields-for-elementor'),
+                    'raw' => __('Element will be hidden when the conditions are met.', 'acf-repeater-for-elementor'),
                     'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
                     'condition' => [
                         'arfe_enable_conditions' => 'yes',
@@ -262,7 +263,7 @@ class Elementor_ACF_Field_Settings
      */
     private function get_acf_fields()
     {
-        $acf_fields = array('default' => __('-- Select Field --', 'acf-fields-for-elementor'));
+        $acf_fields = array('default' => __('-- Select Field --', 'acf-repeater-for-elementor'));
 
         if (function_exists('acf_get_field_groups')) {
             $field_groups = acf_get_field_groups();

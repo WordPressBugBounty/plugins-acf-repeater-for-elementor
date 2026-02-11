@@ -1,13 +1,13 @@
 <?php
 
-namespace ARFE_Repeater_For_Elementor\Widgets;
+namespace SYMP_Repeater_For_Elementor\Widgets;
 
 use Elementor\Controls_Manager;
 use ElementorPro\Modules\LoopBuilder\Widgets\Loop_Carousel;
 
 if (!defined('ABSPATH')) exit;
 
-class ARFE_Repeater_Carousel extends Loop_Carousel
+class SYMP_Repeater_Carousel extends Loop_Carousel
 {
 
     public function get_name()
@@ -17,7 +17,7 @@ class ARFE_Repeater_Carousel extends Loop_Carousel
 
     public function get_title()
     {
-        return __('ACF Repeater Loop Carousel', 'arfe-repeater-for-elementor');
+        return __('ACF Repeater Loop Carousel', 'acf-repeater-for-elementor');
     }
 
     public function get_icon()
